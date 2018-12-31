@@ -17,8 +17,9 @@
   "author": "Preston Wallace",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
     "@babel/polyfill": "^7.2.5",
+    "axios": "^0.18.0",
+    "chalk": "^2.4.1",
     "connect-session-sequelize": "^6.0.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
