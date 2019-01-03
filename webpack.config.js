@@ -1,9 +1,12 @@
 module.exports = {
-  entry: './client/main.js',
+  entry: {
+    client: './src/client.js',
+    bundle: './src/bundle.js'
+  },
   mode: 'development',
   output: {
     path: __dirname,
-    filename: './public/bundle.js'
+    filename: '[name].js'
   },
   devtool: 'source-maps',
   module: {
@@ -12,7 +15,8 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: 'babel-loader',
+          
         }
       },
       {

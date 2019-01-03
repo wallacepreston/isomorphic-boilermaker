@@ -1,3 +1,6 @@
+
+
+import React from 'react'
 const express = require('express');
 const app = express();
 const path = require('path')
@@ -5,6 +8,9 @@ const morgan = require('morgan');
 const {db, User} = require('./db');
 const session = require('express-session')
 const passport = require('passport');
+const { renderToString } = require('react-dom/server');
+const Root = require('../client/components/root');
+const template = require('./template')
 
 // serializing user is adding session information to our store in DB, so Passport knows how to find the user for subsequent requests.
 passport.serializeUser((user, done) => {
@@ -58,10 +64,64 @@ app.use(express.static(path.join(__dirname, '..', 'public')))
 // Authentication Router
 app.use('/auth', require('./auth'))
 
+let initialState = {
+}
+
+//SSR function import
+const ssr = require('./server');
+
+// server rendered home page
+app.get('/', (req, res) => {
+  const { preloadedState, content}  = ssr(initialState)
+  const response = template("Server Rendered Page", preloadedState, content)
+  res.setHeader('Cache-Control', 'assets, max-age=604800')
+  res.send(response);
+});
+
+// Pure client side rendered page
+app.get('/client', (req, res) => {
+  let response = template('Client Side Rendered page')
+  res.setHeader('Cache-Control', 'assets, max-age=604800')
+  res.send(response);
+});
+
+// tiny trick to stop server during local development
+
+  app.get('/exit', (req, res) => {
+    if(process.env.PORT) {
+      res.send("Sorry, the server denies your request")
+    } else {
+      res.send("shutting down")
+      process.exit(0)
+    }
+
+  });
+
 // For all GET requests that aren't to an API or auth route, send index.html
-app.get('/*', (req, res, next) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'))
-})
+// app.get( '/*', ( req, res ) => {
+//   const jsx = ( <Root /> );
+//   const reactDom = renderToString( jsx );
+
+//   res.writeHead( 200, { 'Content-Type': 'text/html' } );
+//   res.end( htmlTemplate( reactDom ) );
+// } );
+
+function htmlTemplate( reactDom ) {
+  return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+          <meta charset="utf-8">
+          <title>React SSR</title>
+      </head>
+      
+      <body>
+          <div id="app">${ reactDom }</div>
+          <script src="./app.bundle.js"></script>
+      </body>
+      </html>
+  `;
+}
 
 // Handle 404s
 app.use((req, res, next) => {
