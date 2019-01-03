@@ -1,6 +1,6 @@
 # Boiler Maker
 
-A 'boilerplate' skeleton of a web app using the full stack, Isomorphic.  Cloned from https://github.com/wallacepreston/boilermaker.
+A 'boilerplate' skeleton of a web app using the full stack, Isomorphic.  Cloned from https://github.com/wallacepreston/boiler-maker.
 
 ## Getting started
 
